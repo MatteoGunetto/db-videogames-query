@@ -200,14 +200,44 @@ WHERE awards.name = 'gioco più atteso' AND award_videogame.year = 2018 AND tour
 
 10- Selezionare i dati della prima software house che ha rilasciato un gioco, assieme ai dati del gioco stesso (software house id : 5)
 
-
+ SELECT software_houses.id, software_houses.name, videogames.name, videogames.release_date 
+FROM software_houses  
+	JOIN videogames 
+	ON software_houses.id = videogames.software_house_id 
+ORDER BY videogames.release_date 
+LIMIT 1;
+-----------------------------------------------------------------
 
 11- Selezionare i dati del videogame (id, name, release_date, totale recensioni) con più recensioni (videogame id : potrebbe uscire 449 o 398, sono entrambi a 20)
 
-
+SELECT videogames.id, videogames.name, videogames.release_date, COUNT(*) as reviews_count
+FROM videogames
+JOIN reviews ON videogames.id = reviews.videogame_id
+GROUP BY videogames.id, videogames.name, videogames.release_date
+ORDER BY reviews_count DESC
+LIMIT 1;
+-----------------------------------------------------------------
 
 12- Selezionare la software house che ha vinto più premi tra il 2015 e il 2016 (software house id : potrebbe uscire 3 o 1, sono entrambi a 3)
 
-
+SELECT software_houses.id, software_houses.name, COUNT(awards.id) as total_awards
+FROM software_houses
+INNER JOIN videogames ON software_houses.id = videogames.software_house_id
+INNER JOIN award_videogame ON videogames.id = award_videogame.videogame_id
+INNER JOIN awards ON award_videogame.award_id = awards.id
+WHERE award_videogame.year >= 2015 AND award_videogame.year <= 2016
+GROUP BY software_houses.id, software_houses.name
+ORDER BY COUNT(awards.id) DESC
+LIMIT 1;
+-----------------------------------------------------------------
 
 13- Selezionare le categorie dei videogame i quali hanno una media recensioni inferiore a 2 (10)
+
+SELECT categories.name as category_name, AVG(reviews.rating) AS average_rating
+FROM categories
+INNER JOIN category_videogame ON categories.id = category_videogame.category_id
+INNER JOIN videogames ON category_videogame.videogame_id = videogames.id
+INNER JOIN reviews ON videogames.id = reviews.videogame_id
+GROUP BY categories.name, reviews.rating
+HAVING AVG(reviews.rating) < 2;
+-----------------------------------------------------------------
